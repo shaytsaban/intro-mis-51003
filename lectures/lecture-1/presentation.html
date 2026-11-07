@@ -1481,7 +1481,8 @@ qq('.anim').forEach(box=>{
   S.curK=f.curK||(S.cur==='fh'||f.fill?'plus':'arrow');
   return S;}
  const stateAt=k=>{const S=init();for(let i=0;i<k;i++)apply(S,C.frames[i]);return S;};
- function render(S,typed){
+ let lastS=null;
+ function render(S,typed){lastS=S;
   const ed=S.ed,et=ed?(typed!=null?typed:ed.t):null,er=ed?refs(et):[];const hl={...S.hl};er.forEach(r=>{cells(r.k).forEach(a=>{if(!(a in hl))hl[a]=r.col;});});
   const A=pa(S.sel),B=S.sel2?pa(S.sel2):A,r0=Math.min(A.r,B.r),r1=Math.max(A.r,B.r),c0=Math.min(A.c,B.c),c1=Math.max(A.c,B.c);
   qq('td',win).forEach(td=>{const a=td.dataset.a,p=pa(a);let v=S.vals[a]??'';const f=S.showF&&S.raws[a];if(f)v=S.raws[a];const me=ed&&ed.a===a;
@@ -1522,6 +1523,8 @@ qq('.anim').forEach(box=>{
  caps.forEach(c=>obs.observe(c,{attributes:true,attributeFilter:['class']}));
  /* a slide entered again starts from its current reveals, with no animation */
  new MutationObserver(()=>{if(box.closest('.slide.on')){shownK=-2;const k=caps.filter(c=>c.classList.contains('show')).length;go(k);}}).observe(box.closest('.slide'),{attributes:true,attributeFilter:['class']});
+ /* a window resized while the slide is open: measure again, so the cursor stays on its cell */
+ addEventListener('resize',()=>{if(!box.closest('.slide.on')||!lastS)return;clear();if(!fitted)fit();const k=caps.filter(c=>c.classList.contains('show')).length;const S=stateAt(k);render(S);place(S,true);if(!k)cur.classList.remove('on');});
  go(0);});
 })();
 /* ===== pop-up memes: bounce in, stay a moment, then shrink to a badge that reopens them ===== */
